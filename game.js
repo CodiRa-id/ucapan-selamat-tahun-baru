@@ -11,8 +11,12 @@ function initScenes() {
             text: "Selamat tahun baru 2026",
             tapToContinue: true,
             choices: [],
+            choices: [],
             characterImage: "scene 1.webp",
-            showConfetti: true
+            showConfetti: true,
+            sound: "Sound effect terompet lucu.mp3",
+            secondarySound: "kids-cheering-sound-effect-no-copyright-free-to-use.mp3",
+            secondarySoundDelay: 2000
         },
         // Scene 2 - Buttons evade cursor
         {
@@ -129,6 +133,18 @@ async function renderScene(sceneIndex) {
     // Trigger Confetti if needed
     if (scene.showConfetti) {
         triggerConfetti();
+    }
+
+    // Play Scene Sound
+    if (scene.sound) {
+        playSound(scene.sound);
+    }
+
+    // Play Secondary Sound (e.g. cheering after trumpet)
+    if (scene.secondarySound) {
+        setTimeout(() => {
+            playSound(scene.secondarySound);
+        }, scene.secondarySoundDelay || 1000);
     }
 
     // Fade in animation
@@ -407,9 +423,6 @@ function triggerConfetti() {
 
     container.innerHTML = '';
 
-    // Play SFX
-    playSound('Sound effect terompet lucu.mp3');
-
     const colors = ['#f39c12', '#e74c3c', '#3498db', '#2ecc71', '#9b59b6', '#ecf0f1', '#e67e22', '#1abc9c'];
 
     // 1. Falling Ribbons (CSS Animation) - From Top
@@ -482,18 +495,27 @@ function triggerConfetti() {
         };
     }
 
-    // Spawn Particles
-    for (let i = 0; i < burstCount; i++) {
-        // Left Burst
-        particles.push(createBurstParticle(0, window.innerHeight, 1));
-        // Right Burst
-        particles.push(createBurstParticle(window.innerWidth, window.innerHeight, -1));
-    }
+    // Spawn Particles with Delay
+    setTimeout(() => {
+        // Spawn Particles
+        for (let i = 0; i < burstCount; i++) {
+            // Left Burst
+            particles.push(createBurstParticle(0, window.innerHeight, 1));
+            // Right Burst
+            particles.push(createBurstParticle(window.innerWidth, window.innerHeight, -1));
+        }
+
+        // Animation Loop (starts when particles exist)
+        if (!active) {
+            active = true;
+            requestAnimationFrame(animate);
+        }
+    }, 500); // 2 Second Delay for Sprays
 
     // Animation Loop
     let active = true;
     function animate() {
-        if (!active) return;
+        if (!active && particles.length === 0) return; // Wait for particles if none yet? No, ribbons are CSS.
 
         let aliveCount = 0;
         particles.forEach(p => {
@@ -511,13 +533,21 @@ function triggerConfetti() {
             p.element.style.opacity = p.opacity;
         });
 
-        if (aliveCount > 0) {
+        if (aliveCount > 0 || particles.length < burstCount * 2) {
+            // Keep loop running if particles are alive OR if we haven't spawned them yet (simple hack: check specific flag or just let it run)
+            // Better: just let it run.
             requestAnimationFrame(animate);
-        } else {
+        } else if (particles.length > 0) {
             active = false;
         }
     }
 
+    // Start loop immediately for any future needs or just wait for the timeout?
+    // Actually, particles array is empty initially.
+    // simpler: define animate, run it. If particles empty, it does nothing but next frame.
+    // But we need to make sure loop doesn't die before timeout.
+
+    // REVISED LOGIC BELOW for cleaner implementation
     requestAnimationFrame(animate);
 
     // Cleanup after animation (ribbons take ~6s)
@@ -542,7 +572,7 @@ function loadCharacterImage() {
 const ASSETS = {
     images: ['character.png', 'penutup.webp', 'scene 1.webp', 'scene 2.webp', 'scene3.webp', 'scene 4.webp', 'scene 5.webp'],
     videos: ['lie.webm', '1228.webm', 'placeholder-video.mp4'],
-    sounds: ['confetti.mp3', 'Sound effect terompet lucu.mp3', 'button-click.mp3']
+    sounds: ['confetti.mp3', 'Sound effect terompet lucu.mp3', 'button-click.mp3', 'kids-cheering-sound-effect-no-copyright-free-to-use.mp3']
 };
 
 const audioCache = {};
@@ -617,13 +647,27 @@ async function startGame() {
         console.error("Loading error:", e);
     }
 
-    // Hide loading screen
-    loadingScreen.classList.add('hidden');
+    // Wait for user interaction to enable audio
+    if (loadText) loadText.textContent = "Tap to Start";
+    const loader = document.querySelector('.loader');
+    if (loader) loader.style.display = 'none';
 
-    // Start game
-    initScenes();
-    loadCharacterImage();
-    renderScene(0);
+    loadingScreen.style.cursor = 'pointer';
+
+    // One-time click handler to start
+    const startHandler = () => {
+        loadingScreen.removeEventListener('click', startHandler);
+
+        // Hide loading screen
+        loadingScreen.classList.add('hidden');
+
+        // Start game
+        initScenes();
+        loadCharacterImage();
+        renderScene(0);
+    };
+
+    loadingScreen.addEventListener('click', startHandler);
 }
 
 // === INITIALIZE GAME ===
