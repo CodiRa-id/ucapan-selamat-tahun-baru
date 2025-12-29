@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ucapan Selamat Tahun Baru 2026</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&family=Poppins:wght@400;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div id="loading-screen">
+        <div class="loader"></div>
+        <div class="loader-text">Loading Assets...</div>
+    </div>
+
+    <div id="game-container">
+        <!-- Background -->
+        <div id="background"></div>
+
+        <!-- Character Area (Right Side) -->
+        <div id="character-area">
+            <img id="character-image" src="" alt="Character" />
+        </div>
+
+        <div id="character-overlay"></div>
+
+        <!-- Dialog Area (Left Side) -->
+        <div id="dialog-area">
+            <div id="dialog-box">
+                <div id="dialog-text"></div>
+                <div id="tap-to-continue" class="hidden">
+                    <span>▼ Tap untuk lanjut</span>
+                </div>
+            </div>
+
+            <div id="choices-container"></div>
+        </div>
+
+        <!-- Video Container -->
+        <div id="video-container" class="hidden">
+            <video id="game-video" playsinline>
+                <source src="placeholder-video.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <div id="video-overlay"></div>
+        </div>
+
+        <div id="final-quote" class="hidden">
+            <div class="quote-content">
+                <p class="quote-text">
+                    "Barang siapa yang hari ini lebih baik dari hari kemarin, dialah tergolong orang yang beruntung,
+                    (dan) barang siapa yang hari ini sama dengan hari kemarin dialah tergolong orang yang merugi
+                    dan bahkan, barang siapa yang hari ini lebih buruk dari hari kemarin dialah tergolong orang yang
+                    celaka."
+                </p>
+                <p class="quote-source">— HR Al Hakim</p>
+            </div>
+        </div>
+
+        <div id="confetti-container" class="confetti-container"></div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+
+</html>

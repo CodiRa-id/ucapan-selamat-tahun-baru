@@ -1,0 +1,541 @@
+/* === RESET & BASE === */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', 'Noto Sans', sans-serif;
+}
+
+body {
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+    background: radial-gradient(circle at center, #ffffff 0%, #f0f2f5 100%);
+    /* Subtle depth */
+    color: #2c3e50;
+    /* Softer dark blue-grey */
+}
+
+/* === LOADING SCREEN === */
+#loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #fff;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    transition: opacity 0.5s ease;
+}
+
+.loader {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #4CAF50;
+    /* Green accent */
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+}
+
+
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+#loading-screen.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* === GAME CONTAINER === */
+#game-container {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    overflow: hidden;
+}
+
+/* === BACKGROUND === */
+/* Removed complex gradient background */
+#background {
+    display: none;
+}
+
+/* === CHARACTER AREA === */
+#character-area {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 45%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+    pointer-events: none;
+}
+
+#character-image {
+    max-width: 90%;
+    max-height: 85%;
+    object-fit: contain;
+    /* Removed heavy drop shadow for cleaner look */
+    filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.1));
+    transition: all 0.5s ease;
+}
+
+#character-overlay {
+    position: absolute;
+    top: 70%;
+    /* Target vertical position (slightly above bottom) */
+    left: 25%;
+    width: 400px;
+    height: 200px;
+    background: url('penutup.webp') no-repeat center;
+    background-size: contain;
+    background-color: transparent;
+    pointer-events: none;
+    opacity: 0;
+
+    /* Start from BOTTOM (Slide Up effect) - Reverted */
+    transform: translate(-50%, 100%);
+
+    transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    z-index: 10;
+}
+
+#character-overlay.active {
+    opacity: 1;
+    /* End position: Centered on anchor */
+    transform: translate(-50%, -50%);
+}
+
+/* === DIALOG AREA === */
+#dialog-area {
+    position: relative;
+    width: 55%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 60px 80px;
+    z-index: 2;
+}
+
+#dialog-box {
+    /* Simplified dialog box: transparent or very light */
+    background: transparent;
+    padding: 20px 0;
+    margin-bottom: 40px;
+    max-width: 800px;
+    position: relative;
+    animation: fadeSlideIn 0.5s ease-out;
+}
+
+@keyframes fadeSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#dialog-text {
+    font-size: 32px;
+    /* Slightly larger */
+    line-height: 1.5;
+    color: #2c3e50;
+    font-weight: 600;
+    margin-bottom: 30px;
+    letter-spacing: -0.02em;
+}
+
+#tap-to-continue {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+    font-size: 16px;
+    color: #95a5a6;
+    /* Softer grey */
+    cursor: pointer;
+    animation: pulse 2s infinite;
+    user-select: none;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+#tap-to-continue:hover {
+    color: #7f8c8d;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 0.4;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
+/* === CHOICES === */
+#choices-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    max-width: 800px;
+    position: relative;
+    width: 100%;
+}
+
+.choice-btn {
+    border: none;
+    padding: 16px 40px;
+    font-size: 18px;
+    border-radius: 50px;
+    /* Pill shape */
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    /* Bouncy hover */
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    position: relative;
+    animation: fadeIn 0.5s ease-out;
+    background: #ffffff;
+    border: 2px solid #e0e0e0;
+    color: #555;
+    min-width: 140px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* ... */
+
+.choice-btn:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    border-color: transparent;
+}
+
+.choice-btn:active {
+    transform: translateY(-1px);
+}
+
+/* Specific colors for Yes/No */
+.choice-btn.btn-ya {
+    background-color: #2ecc71;
+    /* Modern Emerald */
+    color: white;
+    border: none;
+    box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+}
+
+.choice-btn.btn-ya:hover {
+    background-color: #27ae60;
+    box-shadow: 0 8px 25px rgba(46, 204, 113, 0.4);
+}
+
+.choice-btn.btn-tidak {
+    background-color: #ff6b6b;
+    /* Modern Soft Red */
+    color: white;
+    border: none;
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+}
+
+.choice-btn.btn-tidak:hover {
+    background-color: #fa5252;
+    box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+}
+
+/* Special button states */
+.choice-btn.evading {
+    position: absolute !important;
+    transition: all 0.2s ease-out;
+    z-index: 100;
+}
+
+.choice-btn.covered {
+    /* pointer-events: none; Removed to prevent mouseleave trigger loop */
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* === VIDEO CONTAINER === */
+#video-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    animation: fadeIn 0.5s ease-out;
+}
+
+#game-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* Fills screen, cropping if needed */
+    border: none;
+}
+
+/* === FINAL QUOTE === */
+#final-quote {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 150;
+    padding: 40px;
+    animation: fadeIn 1s ease-out;
+    color: #333;
+}
+
+.quote-content {
+    max-width: 900px;
+    text-align: center;
+    padding: 60px;
+}
+
+.quote-text {
+    font-size: 26px;
+    /* Optimized reading size */
+    line-height: 1.8;
+    color: #2c3e50;
+    font-weight: 500;
+    /* Medium weight for clarity */
+    margin-bottom: 30px;
+    font-style: normal;
+    /* Removed italics for better readability */
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.quote-source {
+    font-size: 20px;
+    color: #666;
+    font-weight: 600;
+}
+
+/* === UTILITY === */
+.hidden {
+    display: none !important;
+}
+
+.fade-out {
+    animation: fadeOut 0.5s ease-out forwards;
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+/* === RESPONSIVE === */
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+    #game-container {
+        flex-direction: column;
+    }
+
+    /* Character on Top (30% Height) */
+    #character-area {
+        position: relative;
+        /* Stacks normally in column flex */
+        width: 100%;
+        height: 30%;
+        opacity: 1;
+        /* Fully visible */
+        right: auto;
+        top: auto;
+        padding-bottom: 0;
+        align-items: flex-end;
+        /* Character stands on the 'floor' of this section */
+        background: transparent;
+        order: 1;
+        /* Visually first */
+    }
+
+    #character-image {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.1));
+    }
+
+    /* Dialog at Bottom (70% Height) */
+    #dialog-area {
+        position: relative;
+        width: 100%;
+        height: 70%;
+        order: 2;
+        /* Visually second */
+        padding: 20px 15px;
+        align-items: center;
+        justify-content: flex-start;
+        /* Start from top of box */
+        text-align: center;
+        background: #ffffff;
+        box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.05);
+        /* Separator shadow */
+        z-index: 5;
+    }
+
+    #dialog-text {
+        font-size: 20px;
+        margin-bottom: 20px;
+        line-height: 1.4;
+    }
+
+    #choices-container {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        width: 100%;
+        gap: 15px;
+        max-height: none;
+        /* Ensure scrolling if too many buttons? Usually fit. */
+        overflow-y: auto;
+    }
+
+    .choice-btn {
+        width: auto;
+        min-width: 120px;
+        max-width: 45%;
+        flex-grow: 1;
+        padding: 12px 10px;
+        font-size: 15px;
+    }
+
+    /* Scene 5 specific stacked layout */
+    #choices-container.stacked {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    #choices-container.stacked .choice-btn {
+        max-width: 100%;
+        width: 100%;
+    }
+
+    #tap-to-continue {
+        margin-top: 20px;
+        font-size: 14px;
+    }
+
+    /* Overlay Adjustment */
+    /* Overlay Adjustment */
+    #character-overlay {
+        left: 50%;
+        top: 75%;
+        width: 100%;
+        height: 50%;
+        transform: translate(-50%, 100%);
+        /* Mobile slide up start */
+    }
+
+    /* Final Quote Mobile Adjustment */
+    #final-quote {
+        padding: 15px;
+    }
+
+    .quote-content {
+        padding: 10px;
+        width: 100%;
+    }
+
+    .quote-text {
+        font-size: 16px;
+        /* Smaller for mobile */
+        line-height: 1.6;
+    }
+}
+
+/* === CONFETTI / RIBBON EFFECT === */
+.confetti-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 2000;
+    overflow: hidden;
+    display: block;
+    /* Always block but empty when unused */
+}
+
+/* Falling Ribbons (CSS Animation) */
+.confetti-ribbon {
+    position: absolute;
+    top: -24px;
+    width: 12px;
+    height: 24px;
+    opacity: 0.8;
+    animation: fall linear forwards;
+    will-change: transform;
+}
+
+@keyframes fall {
+    0% {
+        transform: translateY(-50px) rotate(0deg) translateX(0);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(105vh) rotate(720deg) translateX(var(--drift, 50px));
+        opacity: 0;
+    }
+}
+
+/* Burst Particles (JS Driven) */
+.confetti-particle {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: #f00;
+    /* Overridden by JS */
+    border-radius: 2px;
+    will-change: transform, opacity;
+}
