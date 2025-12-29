@@ -557,22 +557,13 @@ function triggerConfetti() {
     }, 8000);
 }
 
-// === CHARACTER IMAGE LOADING ===
-function loadCharacterImage() {
-    const characterImage = document.getElementById('character-image');
-    // You'll replace this with actual character image
-    characterImage.src = 'character.png';
-    characterImage.onerror = () => {
-        // If image not found, hide character area
-        characterImage.style.opacity = '0.3';
-    };
-}
+
 
 // === PRELOAD ASSETS ===
 const ASSETS = {
-    images: ['character.png', 'penutup.webp', 'scene 1.webp', 'scene 2.webp', 'scene3.webp', 'scene 4.webp', 'scene 5.webp'],
-    videos: ['lie.webm', '1228.webm', 'placeholder-video.mp4'],
-    sounds: ['confetti.mp3', 'Sound effect terompet lucu.mp3', 'button-click.mp3', 'kids-cheering-sound-effect-no-copyright-free-to-use.mp3']
+    images: ['penutup.webp', 'scene 1.webp', 'scene 2.webp', 'scene3.webp', 'scene 4.webp', 'scene 5.webp'],
+    videos: ['lie.webm', '1228.webm'],
+    sounds: ['Sound effect terompet lucu.mp3', 'button-click.mp3', 'kids-cheering-sound-effect-no-copyright-free-to-use.mp3']
 };
 
 const audioCache = {};
@@ -581,50 +572,54 @@ function playSound(src) {
     if (audioCache[src]) {
         audioCache[src].currentTime = 0;
         audioCache[src].play().catch(e => console.warn("Audio play failed:", e));
+    } else {
+        // Fallback if not cached or cache failed
+        const audio = new Audio(src);
+        audio.play().catch(e => console.warn("Audio play failed:", e));
     }
 }
 
 function preloadImage(src) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
         const img = new Image();
         img.src = src;
         img.onload = resolve;
         img.onerror = () => {
             console.warn(`Failed to load image: ${src}`);
-            resolve(); // Continue anyway
+            resolve();
         };
     });
 }
 
 function preloadVideo(src) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
         const video = document.createElement('video');
         video.src = src;
         video.preload = 'auto';
         video.oncanplaythrough = resolve;
         video.onerror = () => {
             console.warn(`Failed to preload video: ${src}`);
-            resolve(); // Continue anyway
+            resolve();
         };
-        // Force load logic if needed, but usually src assignment is enough to start buffering
-        // Set a timeout to avoid hanging forever
-        setTimeout(resolve, 3000);
+        // Timeout to prevent hanging if browser limits preloading
+        setTimeout(resolve, 5000);
     });
 }
 
 function preloadAudio(src) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
         const audio = new Audio();
         audio.src = src;
         audio.preload = 'auto';
+        // events: canplaythrough is ideally what we want
         audio.oncanplaythrough = resolve;
         audio.onerror = () => {
             console.warn(`Failed to preload audio: ${src}`);
-            resolve(); // Continue anyway
+            resolve();
         };
-        // Cache it
         audioCache[src] = audio;
 
+        // Timeout fallback
         setTimeout(resolve, 3000);
     });
 }
@@ -663,7 +658,6 @@ async function startGame() {
 
         // Start game
         initScenes();
-        loadCharacterImage();
         renderScene(0);
     };
 
